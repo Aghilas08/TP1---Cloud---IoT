@@ -166,6 +166,8 @@ Pour établir la connexion SSH, une redirection de port (port forwarding) a ét�
   <em>Figure 13 : Paramétres NAT dans VMware</em>
 </p>
 
+**Remarque :** on peut ne pas spécifier l'addresse ip de la machine distante. 
+
 ### Teste de connection :
 
 <p align="center">
@@ -174,6 +176,10 @@ Pour établir la connexion SSH, une redirection de port (port forwarding) a ét�
   <em>Figure 14 : Connection via ssh</em>
 </p>
 
+### Mise a jour du systéme
+````shell
+sudo apt update && sudo apt upgrade -y
+````
 ---
 # Ressources 
 * **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
