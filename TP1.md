@@ -116,7 +116,7 @@ Cela permet de créer et gérer des volumes logiques (pour le système et donné
 A la fin la machine doit etre redémarrer.
 
 # Vérification
-
+### Systeme et utilisateur
 <p align="center">
   <img src="/img/infos.png" width="720">
   <br>
@@ -131,7 +131,7 @@ A la fin la machine doit etre redémarrer.
 
 ###### utilisateur "aghi" avec l'id 1000 est membre du groupe sudo ce qui implique que cette utilisateur pour executer des commandes en tant que super-utilisateur.
 
-
+### La configuration réseau
 <p align="center">
   <img src="/img/ip.png" width="720">
   <br>
@@ -140,7 +140,7 @@ A la fin la machine doit etre redémarrer.
 
 ###### ens33 : (@MAC = 00:0c:29:f6:ef:f2) lui est attribuer l'addresse ip 192.168.232.132
 ###### lo : c'est l'interface loopback (locale) avec une ip 127.0.0.1
-
+### Service SSH
 <p align="center">
   <img src="/img/ssh2.png" width="720">
   <br>
@@ -154,6 +154,13 @@ systemctl status ssh  # donne des infos sur le service
 systemctl enable ssh  # activer le service
 systemctl restart ssh # redemarer le service en cas de modification de sa configuration dans /etc/ssh/sshd_config
 ````
+### Partition
+
+<p align="center">
+  <img src="/img/partition.png" width="720">
+  <br>
+  <em>Figure 13 : informations sur le stockage</em>
+</p>
 
 # Redirection de port NAT
 Dans cette configuration, l’objectif est de permettre l’accès à la machine virtuel **5G_2025** depuis **la machine hôte** à l’aide du protocole SSH. La machine virtuelle utilise une carte réseau en mode NAT, ce qui lui permet de partager la connexion Internet de l’hôte tout en restant isolée du réseau local.
@@ -163,7 +170,7 @@ Pour établir la connexion SSH, une redirection de port (port forwarding) a ét�
 <p align="center">
   <img src="/img/nat.png" width="720">
   <br>
-  <em>Figure 13 : Paramétres NAT dans VMware</em>
+  <em>Figure 14 : Paramétres NAT dans VMware</em>
 </p>
 
 **Remarque :** on peut ne pas spécifier l'addresse ip de la machine distante. 
@@ -173,7 +180,7 @@ Pour établir la connexion SSH, une redirection de port (port forwarding) a ét�
 <p align="center">
   <img src="/img/login.png" width="720">
   <br>
-  <em>Figure 14 : Connection via ssh</em>
+  <em>Figure 15 : Connection via ssh</em>
 </p>
 
 ### Mise a jour du systéme
