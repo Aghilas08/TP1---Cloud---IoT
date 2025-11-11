@@ -164,6 +164,12 @@ systemctl restart ssh # redemarer le service en cas de modification de sa config
   <em>Figure 13 : informations sur le stockage</em>
 </p>
 
+* **Rappel sur les droits dans linux**
+  * ``b`` = périphérique bloc (block device)
+  * ``utilisateur propriétaire`` : root (droits : lecture et écriture)
+  * ``groupe propriétaire`` : disk (droits : lecture et écriture)
+  * ``tous les autres`` : aucun droit
+
 # Redirection de port NAT
 Dans cette configuration, l’objectif est de permettre l’accès à la machine virtuel **5G_2025** depuis **la machine hôte** à l’aide du protocole SSH. La machine virtuelle utilise une carte réseau en mode NAT, ce qui lui permet de partager la connexion Internet de l’hôte tout en restant isolée du réseau local.
 
