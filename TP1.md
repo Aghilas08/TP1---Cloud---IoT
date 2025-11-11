@@ -21,6 +21,8 @@ Groupe : RSA 2025-2026
 </p>
 
 ---
+# Partie 1
+
 ### Objectif : 
  * installer une VM linux.
  * Accéder a cette VM via SSH.
@@ -28,7 +30,7 @@ Groupe : RSA 2025-2026
 ### Exigence :
  * **OS Linux** : Ubuntu Server 22.04 LTS (LTS : stands for long-term support nous offre 5 années de mise a jour et de correctifs de sécurité)
  * **Hyperviseur** : ``VirtualBox`` ``VMware`` 
-# Machine Virtuel 
+## Machine Virtuel 
 <p align="center">
   <img src="/img/VM_H2.png"  width="300">
   <br>
@@ -39,7 +41,7 @@ Cette configuration décrit un environnement de virtualisation.
 Le **hardware** (CPU, RAM, stockage et la carte réseau (NIC)) qui sont les ressources physiques de l’ordinateur hôte. Sur ce matériel tourne un **OS** Windows 11, qui gère directement ces ressources. au dessus, un **hyperviseur de type 2**, en l’occurrence **VMware**, permet de créer et d’exécuter des machines virtuelles. Chaque machine virtuelle dispose de ressources virtuelles (CPU , RAM...) fournies par l’hyperviseur.
 Dans cet environnement, la VM utilise un **kernel** (noyau) **Linux** et exécute un **OS Ubuntu Server**, ce qui permet de bénéficier d’un système Linux complet tout en restant hébergé sur un ordinateur Windows.
 
-# Installation
+## Installation
 ### 1. Récapitulatif VM sous VMware :
 
 <p align="center">
@@ -83,13 +85,13 @@ Cette machine est configurée comme un client DHCP, ce qui signifie qu’elle ob
 Utiliser un disque entier (70GB) en LVM (Logical Volume Manager) consiste à regrouper tout le disque dans un groupe de volumes (Volume Group).
 Cela permet de créer et gérer des volumes logiques (pour le système et données ... ) et de redimensionner facilement les partitions.
 ###### Périphériques physiques utilisé :
-   * **ubuntu-vg** en LVM volume group
-   * **ubuntu-lv** formater en **ext4** et monté à **/**
+   * **ubuntu-vg** le LVM volume group
+   * **ubuntu-lv** formater en **ext4** et monté au répértoire **/**
    * **/dev/sda** - 70GB (disque local)
 
-  * **partition 1** : (BIOS grub spacer espace réservé pour le bootloader **GRUB**)
-  * **partition 2** : 2,000 Go (formater en **ext4**, monté à **/boot** contien les fichiers nécessaires au démarrage)
-  * **partition 3** : 67,997 Go (LVM volume group ubuntu-vg ou on trouve tous les fichiers du système et des utilisateurs (/home, /var, /usr, /etc, etc.)
+  * **partition 1** : (BIOS grub spacer : espace réservé pour le bootloader **GRUB**)
+  * **partition 2** : 2Go (formater en **ext4**, monté à **/boot** contien les fichiers nécessaires au démarrage)
+  * **partition 3** : 68Go (LVM volume group ubuntu-vg ou on trouve tous les fichiers du système et des utilisateurs (/home, /var, /usr, /etc,...)
 
 * * **Système de fichiers utilisé** : **ext4** est le système de fichiers par défaut pour les distributions Linux. Il offre une performante gestion des volumes.
 * * **GRUB** : c'est le premier programme qui se lance quand on allume les machines dont leurs systemes d'exploitation est linux.
@@ -105,7 +107,7 @@ Cela permet de créer et gérer des volumes logiques (pour le système et donné
 * * exécuter des commandes sur une machine distante
 * * Transférer des fichiers de manière sécurisée (avec la commande ``scp``)
 
-### 3. Phase dinstalation
+### 3. Phase d'instalation
 
 <p align="center">
   <img src="/img/installation.png" width="720">
@@ -113,9 +115,9 @@ Cela permet de créer et gérer des volumes logiques (pour le système et donné
   <em>Figure 8 : phase d'installation</em>
 </p>
 
-A la fin la machine doit etre redémarrer.
+A la fin de l'installation de l'os on doit impérativement redémarrer la **vm** afin d'ejecter le support d'installation.
 
-# Vérification
+## Vérification
 ### Systeme et utilisateur
 <p align="center">
   <img src="/img/infos.png" width="720">
@@ -129,7 +131,7 @@ A la fin la machine doit etre redémarrer.
   <em>Figure 10 : informations sur utilisateur</em>
 </p>
 
-###### utilisateur "aghi" avec l'id 1000 est membre du groupe sudo ce qui implique que cette utilisateur pour executer des commandes en tant que super-utilisateur.
+###### utilisateur "aghi" avec l'id 1000 est membre du groupe sudo ce qui implique que cette utilisateur peut executer des commandes en tant que super-utilisateur.
 
 ### La configuration réseau
 <p align="center">
@@ -138,7 +140,7 @@ A la fin la machine doit etre redémarrer.
   <em>Figure 11 : informations réseau</em>
 </p>
 
-###### ens33 : (@MAC = 00:0c:29:f6:ef:f2) lui est attribuer l'addresse ip 192.168.232.132
+###### ens33 : (@MAC = 00:0c:29:f6:ef:f2) lui est attribuer l'addresse ip 192.168.232.132 (auprés d'un serveur dhcp)
 ###### lo : c'est l'interface loopback (locale) avec une ip 127.0.0.1
 ### Service SSH
 <p align="center">
@@ -184,10 +186,11 @@ Pour établir la connexion SSH, une redirection de port (port forwarding) a ét�
 </p>
 
 ### Mise a jour du systéme
+* Premieres commande a éxecuter :
 ````shell
 sudo apt update && sudo apt upgrade -y
 ````
 ---
 # Ressources 
 * **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
-* **Figure 2 --> Figure 14** : Captures d'écran
+* **Figure 2 --> Figure 15** : Captures d'écran
