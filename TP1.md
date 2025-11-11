@@ -208,7 +208,7 @@ sudo apt update && sudo apt upgrade -y
  * Installation des outils essentiels :
    * docker, kind, kubectl
  * Préparer l'environnement pour Free5GC :
-   * installer le noyaul GTP5G.
+   * installer le noyau GTP5G.
  * Création du cluster Kubernetes.
 
 ### Prérequis
@@ -245,7 +245,7 @@ sudo apt update && sudo apt upgrade -y
   <em>Figure 17 : Docker repository</em>
 </p>
 
-* Insttalation du package Docker :
+* Instalation du package Docker :
 ````bash
 sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ````
@@ -254,7 +254,7 @@ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin dock
 <p align="center">
   <img src="/img/teste-docker.png" width="720">
   <br>
-  <em>Figure 17 : teste docker</em>
+  <em>Figure 18 : teste docker</em>
 </p>
 
 ## kubectl
@@ -276,6 +276,55 @@ sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
 sudo apt update
 sudo apt install -y kubectl
 ````
+* Source : https://kubernetes.io/fr/docs/tasks/tools/install-kubectl/
+
+<p align="center">
+  <img src="/img/teste-kubectl.png" width="480">
+  <br>
+  <em>Figure 19 : teste kubectl</em>
+</p>
+
+## Le noyau GTP5G
+**GTP5G** implémente le protocole GPRS Tunneling Protocol pour la 5G directement dans le noyau Linux. Il gère le **plan utilisateur** (User Plane) du réseau 5G (Les données utilisateur transitent via ces tunnels GTP).
+
+* **Le rôle de GTP5G dans free5GC** :
+
+ * **Encapsuler/désencapsuler** les paquets de données utilisateur.
+ * **Router** le trafic entre la station de base (**gNB**) et le réseau de données.
+ * Gérer les **sessions PDU** (Protocol Data Unit)
+
+### Installation
+````shell
+apt install -y make gcc unzip gcc
+curl -LO https://github.com/free5gc/gtp5g/archive/refs/tags/v0.8.10.zip
+unzip v0.8.10 && cd gtp5g-0.8.10
+make clean & make
+sudo make install
+````
+* Source : https://github.com/WillemBerr/upc-free5gc
+
+### Vérification et résultats
+
+<p align="center">
+  <img src="/img/gtp5g.png" width="600">
+  <br>
+  <em>Figure 20 : tunnel GTP5G</em>
+</p>
+
+Le module **gtp5g** a été chargé avec succès dans **le noyau Linux** et configuré pour se charger automatiquement à chaque démarrage du système grâce au fichier **/etc/modules-load.d/gtp5g.conf**, ce qui signifie que vous n'aurez pas besoin de le charger manuellement après un redémarrage.
+
+<p align="center">
+  <img src="/img/process-gtp5g.png" width="720">
+  <br>
+  <em>Figure 21 : processus GTP5G</em>
+</p>
+
+* **gtp5g** : Module chargé, taille 151552 octets, avec 0 utilisateurs actifs pour le moment
+* **udp_tunnel** : Module dépendance chargé, taille 32768 octets, utilisé par 1 module (**gtp5g**)
+* pas des **PID** de processus. Les modules du noyau ne sont pas des processus utilisateur, ils font partie intégrante du noyau Linux.
+
+## kind
+
 
 ---
 ---
@@ -284,9 +333,12 @@ sudo apt install -y kubectl
 * **5G** : 5 Generation
 * **5GC** : 5G Core Network
 * **3GPP** : 3rd Generation Partnership Project
+* **gNB** :
+* **gtp5g** :
 # Ressources 
 * **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
 * **Ducumentation free5gc** : https://free5gc.org/
 * **Figure 2 --> Figure 15** : Captures d'écran
 * **Figure 16** : https://www.docker.com/resources/what-container/
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
+* **Figure 18 --> Figure 21** : Captures d'écran
