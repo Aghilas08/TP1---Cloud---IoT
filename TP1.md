@@ -2,9 +2,9 @@
 Auteur : Aghilas OULD BRAHAM
 Groupe : RSA 2025-2026
 ----
-<h3 align="center">TP1 : Machine Virtuel</h3>
+<h3 align="center">Rapport : 5G Telco Cloud</h3>
 
-<p align="center"><i>Installation ubuntu server sous VMware</i></p>
+<p align="center"><i>Simulation 5G Core Network </i></p>
 <p align="center">
     <a href="https://www.u-paris.fr/">
        <img alt="Université Paris Cité" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Logo_Universit%C3%A9_Paris-Cit%C3%A9_%28partenariat_Wikim%C3%A9dia%29.svg/1024px-Logo_Universit%C3%A9_Paris-Cit%C3%A9_%28partenariat_Wikim%C3%A9dia%29.svg.png" width="100">
@@ -27,7 +27,7 @@ Groupe : RSA 2025-2026
  * installer une VM linux.
  * Accéder a cette VM via SSH.
 
-### Exigence :
+### Prérequis :
  * **OS Linux** : Ubuntu Server 22.04 LTS (LTS : stands for long-term support nous offre 5 années de mise a jour et de correctifs de sécurité)
  * **Hyperviseur** : ``VirtualBox`` ``VMware`` 
 ## Machine Virtuel 
@@ -196,7 +196,30 @@ Pour établir la connexion SSH, une redirection de port (port forwarding) a ét�
 ````shell
 sudo apt update && sudo apt upgrade -y
 ````
+
 ---
+# Partie 2
+## Free5GC
+**free5GC** est un projet **open source** (par **Linux Foundation**) qui implémente le **cœur de réseau 5G** (5G Core Network) conformément aux spécifications **3GPP**.Il est conçu principalement pour la recherche et l’expérimentation sur les réseaux 5G.
+  * **La Linux Foundation** est une organisation à but non lucratif qui soutient le développement de projets open source, dont Linux et de nombreuses technologies comme Kubernetes.
+  * **Le 3GPP** est un partenariat international d’organismes de normalisation,leurs roles est de standardiser les protocoles et les architectures réseaux télécomes (3G, 4G, 5G,...)
+
+### Objectif : 
+ * Installation des outils essentiels :
+   * docker, kind, kubectl
+ * Préparer l'environnement pour Free5GC :
+   * installer le noyaul GTP5G.
+ * Création du cluster Kubernetes.
+
+### Prérequis
+ * **VM ubuntu server** (VM installer dans la partie 1)
+---
+---
+# Glossaire
+* **5G** : 5 Generation
+* **5GC** : 5G Core Network
+* **3GPP** : 3rd Generation Partnership Project
 # Ressources 
 * **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
+* **Ducumentation free5gc** : https://free5gc.org/
 * **Figure 2 --> Figure 15** : Captures d'écran
