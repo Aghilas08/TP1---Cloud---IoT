@@ -213,9 +213,74 @@ sudo apt update && sudo apt upgrade -y
 
 ### Prérequis
  * **VM ubuntu server** (VM installer dans la partie 1)
+
+## Docker
+**Docker** est une plateforme **open source** qui permet de créer, déployer et exécuter des applications dans des **conteneurs** (en lui offrant tout ce dont elle a besoin pour fonctionner).
+**Un conteneur** est comme une boîte qui contient :
+ * le code ou l'application
+ * Toutes ses dépendances (bibliothèques, fichiers de configuration...)
+
+<p align="center">
+  <img src="/img/infra-docker.avif" width="720">
+  <br>
+  <em>Figure 16 : shéma docker</em>
+</p>
+
+* **Le fonctionnement :**
+   * Étape 1 : L'**Image Docker** (Contient le système d'exploitation minimal, l'application et ses dépendances crée à partir d'un fichier **Dockerfile** ou d'un ``docker commit``)
+
+
+
+
+   * Étape 2 : Le **Conteneur** (C'est une instance **en cours d'exécution** d'une image)
+
+
+  * Étape 3 : **L'exécution** (Le conteneur s'exécute de manière isolée sur le système hôte et partage le **kernel** du système d'exploitation hôte (contrairement aux VM))
+### Installation
+*	Configurer le **Docker apt repository** :
+
+<p align="center">
+  <img src="/img/Image1.png" width="720">
+  <br>
+  <em>Figure 17 : Docker repository</em>
+</p>
+
+* Insttalation du package Docker :
+````bash
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+````
+* Verification et teste :
+  
+<p align="center">
+  <img src="/img/teste-docker.png" width="720">
+  <br>
+  <em>Figure 17 : teste docker</em>
+</p>
+
+## kubectl
+``kubectl`` est l'outil en ligne de commande pour interagir avec **Kubernetes** (la plateforme open-source d'orchestration de conteneurs).Elles permet de :
+
+* Déployer des applications sur un **cluster Kubernetes**
+* Inspecter et gérer les ressources du cluster (pods, services, déploiements...)
+* Consulter les logs.
+* Exécuter des commandes dans les conteneur
+
+### Installer et configurer kubectl
+````shell
+sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gnupg
+sudo mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.33/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
+sudo apt update
+sudo apt install -y kubectl
+````
+
 ---
 ---
 # Glossaire
+* **VM** : Virtual Machine
 * **5G** : 5 Generation
 * **5GC** : 5G Core Network
 * **3GPP** : 3rd Generation Partnership Project
@@ -223,3 +288,5 @@ sudo apt update && sudo apt upgrade -y
 * **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
 * **Ducumentation free5gc** : https://free5gc.org/
 * **Figure 2 --> Figure 15** : Captures d'écran
+* **Figure 16** : https://www.docker.com/resources/what-container/
+* **Figure 17** : https://github.com/Aghilas08/Docker.git
