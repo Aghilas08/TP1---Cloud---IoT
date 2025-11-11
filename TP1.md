@@ -289,9 +289,9 @@ sudo apt install -y kubectl
 
 * **Le rôle de GTP5G dans free5GC** :
 
- * **Encapsuler/désencapsuler** les paquets de données utilisateur.
- * **Router** le trafic entre la station de base (**gNB**) et le réseau de données.
- * Gérer les **sessions PDU** (Protocol Data Unit)
+   * **Encapsuler/désencapsuler** les paquets de données utilisateur.
+   * **Router** le trafic entre la station de base (**gNB**) et le réseau de données.
+   * Gérer les **sessions PDU** (Protocol Data Unit)
 
 ### Installation
 ````shell
@@ -324,7 +324,71 @@ Le module **gtp5g** a été chargé avec succès dans **le noyau Linux** et conf
 * pas des **PID** de processus. Les modules du noyau ne sont pas des processus utilisateur, ils font partie intégrante du noyau Linux.
 
 ## kind
+**kind** est un outil permettant d'exécuter des **clusters Kubernetes locaux** en utilisant des conteneurs **Docker comme "nœuds"**. kind a été principalement conçu pour tester Kubernetes lui-même, mais peut également être utilisé pour le développement local ou l'intégration continue (CI).
 
+### Installation à partir Release Binaries
+* **Sous Linux (ubuntu x64)**
+````shell
+# For AMD64 / x86_64
+[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.30.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+````
+  * Source : https://kind.sigs.k8s.io/docs/user/quick-start/#installation
+
+
+<p align="center">
+  <img src="/img/kind.png" width="400">
+  <br>
+  <em>Figure 22 : kind</em>
+</p>
+
+## kind cluster
+On choisi d’utiliser un nœud pour le plan de contrôle (**control plane**) et un nœud de travail (**worker node**)
+
+* **fichier** : *mycluster.yaml*
+````yaml
+kind: Cluster                          # Type de ressource : un cluster KinD
+apiVersion: kind.x-k8s.io/v1alpha4     # Version de l’API utilisée par KinD
+nodes:                                 # Définir les 02 nœuds du cluster
+  - role: control-plane                # 1er nœud : plan de contrôle (maître)
+  - role: worker                       # 2eme nœud : nœud de travail
+
+# SOURCE TP : https://github.com/WillemBerr/upc-free5gc
+## dans le fichier mycluster.yaml du tp on constate qu'il y a des erreurs :
+#### tabulation
+````
+````shell
+## résultat attendu
+aghi@arcadia:~/5G$ sudo kind get nodes
+kind-control-plane
+kind-worker
+````
+* **control-plane** : gère le cluster Kubernetes (API Server, Scheduler, Controller Manager, etcd)
+
+* **worker node** : exécute les pods.
+
+<p align="center">
+  <img src="/img/cluster.png" width="980">
+  <br>
+  <em>Figure 23 : kind cluster</em>
+</p>
+
+### Ajout des CNI plugins
+* **Téléchargement l'archive de la derniere version**
+````shell
+wget https://github.com/containernetworking/plugins/releases/download/v1.6.0/cni-plugins-linux-amd64-v1.6.0.tgz
+
+## décompresser et extraire le fichier
+tar -xzvf cni-plugins-linux-amd64-v1.6.0.tgz
+````
+* **Copier les fichiers dans le dossier /opt/cni/bin de chaque conteneur Docker**
+
+<p align="center">
+  <img src="/img/cni-plugins.png" width="980">
+  <br>
+  <em>Figure 24 : CNI plugins</em>
+</p>
 
 ---
 ---
@@ -333,12 +397,14 @@ Le module **gtp5g** a été chargé avec succès dans **le noyau Linux** et conf
 * **5G** : 5 Generation
 * **5GC** : 5G Core Network
 * **3GPP** : 3rd Generation Partnership Project
-* **gNB** :
-* **gtp5g** :
+* **gNB** : Next Generation Node B
+* **gtp5g** : GPRS Tunneling Protocol for 5G
+
+---
 # Ressources 
 * **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
 * **Ducumentation free5gc** : https://free5gc.org/
 * **Figure 2 --> Figure 15** : Captures d'écran
 * **Figure 16** : https://www.docker.com/resources/what-container/
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
-* **Figure 18 --> Figure 21** : Captures d'écran
+* **Figure 18 --> Figure 24** : Captures d'écran
