@@ -1,7 +1,6 @@
 ----
 Auteur : Aghilas OULD BRAHAM
 ----
-----
 Groupe : RSA 2025-2026
 ----
 <h3 align="center">Rapport : 5G Telco Cloud</h3>
