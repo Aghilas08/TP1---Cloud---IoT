@@ -376,7 +376,7 @@ kind-worker
 </p>
 
 ### Ajout des CNI plugins
-* **Téléchargement l'archive de la derniere version**
+* **Téléchargement de la derniere version :**
 ````shell
 wget https://github.com/containernetworking/plugins/releases/download/v1.6.0/cni-plugins-linux-amd64-v1.6.0.tgz
 
