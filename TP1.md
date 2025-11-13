@@ -375,7 +375,7 @@ kind-worker
 </p>
 
 ### Ajout des CNI plugins
-* **Téléchargement l'archive de la derniere version**
+* **Téléchargement de la derniere version :**
 ````shell
 wget https://github.com/containernetworking/plugins/releases/download/v1.6.0/cni-plugins-linux-amd64-v1.6.0.tgz
 
@@ -388,6 +388,33 @@ tar -xzvf cni-plugins-linux-amd64-v1.6.0.tgz
   <img src="/img/cni-plugins.png" width="980">
   <br>
   <em>Figure 24 : CNI plugins</em>
+</p>
+
+### Architecture du cluster
+* **1. Namespaces :** fournissent un mécanisme pour isoler (isolation logique) les ressources au sein d'un seul cluster.
+  * **namespaces initiaux :**
+    * **default :** Kubernetes inclut ce namespace afin qu'on puisse commencer à utiliser nos cluster sans avoir à créer de namespace.
+    * **kube-system :** le namespace pour les objets créés par le système Kubernetes
+  * **Affichages des namespaces :** ``kubectl get namespace``
+
+* **2. Les concepts derrière Kubernetes :**
+
+<p align="center">
+  <img src="/img/arch-cluster.png" width="980">
+  <br>
+  <em>Figure 25 : Architecture du cluster</em>
+</p>
+
+* **Composants du plan de contrôle :**
+  * **kube-apiserver :** C’est le point d’entrée central pour toutes les commandes kubectl, les communications internes et externes (Il s'agit du front-end pour le plan de contrôle Kubernetes).
+  * **etcd :** Base de données clé-valeur consistante et hautement disponible utilisée comme mémoire de sauvegarde pour toutes les données du cluste.
+  * **kube-scheduler :** Il a pour rôle de surveiller les pods nouvellement créés et choisir sur quel nœud chaque un pod va s’exécuter.
+  * **controller-manager :**
+
+<p align="center">
+  <img src="/img/etat-cluster.png" width="780">
+  <br>
+  <em>Figure 26 : Etat du cluster</em>
 </p>
 
 ---
@@ -408,3 +435,4 @@ tar -xzvf cni-plugins-linux-amd64-v1.6.0.tgz
 * **Figure 16** : https://www.docker.com/resources/what-container/
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
 * **Figure 18 --> Figure 24** : Captures d'écran
+* **Figure 25** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
