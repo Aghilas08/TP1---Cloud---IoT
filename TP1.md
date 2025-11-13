@@ -376,6 +376,8 @@ kind-worker
 </p>
 
 ### Ajout des CNI plugins
+Les **CNI plugins** sont des composants du réseau dans Kubernetes. Ils assurent la connectivité entre les pods, ainsi qu’entre les pods et le monde extérieur.le CNI définit comment un pod obtient une adresse IP, comment il se connecte au réseau, et comment la communication entre pods est gérée à l’intérieur du cluster.
+
 * **Téléchargement de la derniere version :**
 ````shell
 wget https://github.com/containernetworking/plugins/releases/download/v1.6.0/cni-plugins-linux-amd64-v1.6.0.tgz
@@ -415,12 +417,29 @@ tar -xzvf cni-plugins-linux-amd64-v1.6.0.tgz
 <p align="center">
   <img src="/img/etat-cluster.png" width="780">
   <br>
-  <em>Figure 26 : Etat du cluster</em>
+  <em>Figure 26 : Les composants du plan de controle</em>
 </p>
+
+<p align="center">
+  <img src="/img/nodes.png" width="780">
+  <br>
+  <em>Figure 27 : Nodes</em>
+</p>
+
+La commande ``kubectl get nodes -o wide`` permet d’obtenir des informations détaillées sur chaque noeud.
+
+<p align="center">
+  <img src="/img/etat-cluster1.png" width="780">
+  <br>
+  <em>Figure 28 : Etat du cluster</em>
+</p>
+
+La commande ``kubectl cluster-info`` confirme que le plan de contrôle Kubernetes est accessible via l’adresse **https://127.0.0.1:33527**, ce qui correspond au point d’accès local de l’API server exposer par kind. Elle indique également que le service **CoreDNS** est actif (pour la résolution interne des noms de services au sein du cluster).
 
 ---
 ---
 # Glossaire
+* **CNI plugins** : Container Network Interface plugins
 * **VM** : Virtual Machine
 * **5G** : 5 Generation
 * **5GC** : 5G Core Network
@@ -437,3 +456,4 @@ tar -xzvf cni-plugins-linux-amd64-v1.6.0.tgz
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
 * **Figure 18 --> Figure 24** : Captures d'écran
 * **Figure 25** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
+* **Figure 26 --> Figure 28** : Captures d'écran
