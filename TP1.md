@@ -236,7 +236,7 @@ sudo apt update && sudo apt upgrade -y
    * Étape 2 : Le **Conteneur** (C'est une instance **en cours d'exécution** d'une image)
 
 
-  * Étape 3 : **L'exécution** (Le conteneur s'exécute de manière isolée sur le système hôte et partage le **kernel** du système d'exploitation hôte (contrairement aux VM))
+  * Étape 3 : **L'exécution** (Le conteneur s'exécute de manière isolée sur le système hôte et partage le **kernel** du système d'exploitation hôte (contrairement aux VM)
 ### Installation
 *	Configurer le **Docker apt repository** :
 
@@ -322,7 +322,7 @@ Le module **gtp5g** a été chargé avec succès dans **le noyau Linux** et conf
 
 * **gtp5g** : Module chargé, taille 151552 octets, avec 0 utilisateurs actifs pour le moment
 * **udp_tunnel** : Module dépendance chargé, taille 32768 octets, utilisé par 1 module (**gtp5g**)
-* pas des **PID** de processus. Les modules du noyau ne sont pas des processus utilisateur, ils font partie intégrante du noyau Linux.
+* pas de **PID** de processus. Les modules du noyau ne sont pas des processus utilisateur, ils font partie intégrante du noyau Linux.
 
 ## kind
 **kind** est un outil permettant d'exécuter des **clusters Kubernetes locaux** en utilisant des conteneurs **Docker comme "nœuds"**. kind a été principalement conçu pour tester Kubernetes lui-même, mais peut également être utilisé pour le développement local ou l'intégration continue (CI).
@@ -343,6 +343,8 @@ sudo mv ./kind /usr/local/bin/kind
   <br>
   <em>Figure 22 : kind</em>
 </p>
+
+
 
 ## kind cluster
 On choisi d’utiliser un nœud pour le plan de contrôle (**control plane**) et un nœud de travail (**worker node**)
@@ -375,6 +377,48 @@ kind-worker
   <em>Figure 23 : kind cluster</em>
 </p>
 
+### Architecture du cluster
+* **1. Namespaces :** fournissent un mécanisme pour isoler (isolation logique) les ressources au sein d'un seul cluster.
+  * **namespaces initiaux :**
+    * **default :** Kubernetes inclut ce namespace afin qu'on puisse commencer à utiliser nos cluster sans avoir à créer de namespace.
+    * **kube-system :** le namespace pour les objets créés par le système Kubernetes
+  * **Affichages des namespaces :** ``kubectl get namespace``
+
+* **2. Les concepts derrière Kubernetes :**
+
+<p align="center">
+  <img src="/img/arch-cluster.png" width="980">
+  <br>
+  <em>Figure 24 : Architecture du cluster</em>
+</p>
+
+* **Composants du plan de contrôle :**
+  * **kube-apiserver :** C’est le point d’entrée central pour toutes les commandes kubectl, les communications internes et externes (Il s'agit du front-end pour le plan de contrôle Kubernetes).
+  * **etcd :** Base de données clé-valeur consistante et hautement disponible utilisée comme mémoire de sauvegarde pour toutes les données du cluste.
+  * **kube-scheduler :** Il a pour rôle de surveiller les pods nouvellement créés et choisir sur quel nœud chaque un pod va s’exécuter.
+  * **controller-manager :**
+
+<p align="center">
+  <img src="/img/etat-cluster.png" width="780">
+  <br>
+  <em>Figure 25 : Les composants du plan de controle</em>
+</p>
+
+<p align="center">
+  <img src="/img/nodes.png" width="780">
+  <br>
+  <em>Figure 26 : Nodes</em>
+</p>
+
+La commande ``kubectl get nodes -o wide`` permet d’obtenir des informations détaillées sur chaque noeud.
+
+<p align="center">
+  <img src="/img/etat-cluster1.png" width="780">
+  <br>
+  <em>Figure 27 : Etat du cluster</em>
+</p>
+
+La commande ``kubectl cluster-info`` confirme que le plan de contrôle Kubernetes est accessible via l’adresse **https://127.0.0.1:33527**, ce qui correspond au point d’accès local de l’API server exposer par kind. Elle indique également que le service **CoreDNS** est actif (pour la résolution interne des noms de services au sein du cluster).
 ### Ajout des CNI plugins
 Les **CNI plugins** sont des composants du réseau dans Kubernetes. Ils assurent la connectivité entre les pods, ainsi qu’entre les pods et le monde extérieur.le CNI définit comment un pod obtient une adresse IP, comment il se connecte au réseau, et comment la communication entre pods est gérée à l’intérieur du cluster.
 
@@ -390,51 +434,50 @@ tar -xzvf cni-plugins-linux-amd64-v1.6.0.tgz
 <p align="center">
   <img src="/img/cni-plugins.png" width="980">
   <br>
-  <em>Figure 24 : CNI plugins</em>
+  <em>Figure 28 : CNI plugins</em>
 </p>
 
-### Architecture du cluster
-* **1. Namespaces :** fournissent un mécanisme pour isoler (isolation logique) les ressources au sein d'un seul cluster.
-  * **namespaces initiaux :**
-    * **default :** Kubernetes inclut ce namespace afin qu'on puisse commencer à utiliser nos cluster sans avoir à créer de namespace.
-    * **kube-system :** le namespace pour les objets créés par le système Kubernetes
-  * **Affichages des namespaces :** ``kubectl get namespace``
-
-* **2. Les concepts derrière Kubernetes :**
-
-<p align="center">
-  <img src="/img/arch-cluster.png" width="980">
-  <br>
-  <em>Figure 25 : Architecture du cluster</em>
-</p>
-
-* **Composants du plan de contrôle :**
-  * **kube-apiserver :** C’est le point d’entrée central pour toutes les commandes kubectl, les communications internes et externes (Il s'agit du front-end pour le plan de contrôle Kubernetes).
-  * **etcd :** Base de données clé-valeur consistante et hautement disponible utilisée comme mémoire de sauvegarde pour toutes les données du cluste.
-  * **kube-scheduler :** Il a pour rôle de surveiller les pods nouvellement créés et choisir sur quel nœud chaque un pod va s’exécuter.
-  * **controller-manager :**
+### Analyse du réseau Docker utilisé par le cluster Kind
+* **Les réseaux docker** :
+  *	Communication entre les conteneurs ou vers l’extérieur
+  *	Types : host, bridge, none, overlay…
+      *	**Host** : utiliser directement le réseau de l’hôte sur la quel tourne le conteneur.
+      *	**None** : ne pas autoriser la communication entre l’intérieur et l’extérieur.
+      *	**Overlay** : communiquer entre différents conteneurs situer sur diffèrent machines en un réseau unique.
+      * **bridge** : C’est une couche logique connecter à l’interface réseau de la machine (ou a la **vm**), permet de créer un réseau virtuel interne à notre hôte.
+  *	*Un conteneur n’a pas d’@ip fixe*.
 
 <p align="center">
-  <img src="/img/etat-cluster.png" width="780">
+  <img src="/img/net-docker.png" width="580">
   <br>
-  <em>Figure 26 : Les composants du plan de controle</em>
+  <em>Figure 29 : @ip des conteneurs dans docker</em>
 </p>
 
 <p align="center">
-  <img src="/img/nodes.png" width="780">
-  <br>
-  <em>Figure 27 : Nodes</em>
+  <img src="/img/net-kind.png" width="980">
+  <img src="/img/infos_net_nodes.png" width="980">
+  <em>Figure 30 : réseau Docker utilisé par le cluster Kind</em>
 </p>
 
-La commande ``kubectl get nodes -o wide`` permet d’obtenir des informations détaillées sur chaque noeud.
+Ce réseau est de type **bridge**, ce qui signifie qu’il permet la communication entre les conteneurs hébergés localement tout en les isolant du réseau principal de la machine hôte. L’inspection du réseau montre qu’il fonctionne sur le **sous-réseau IPv4 172.18.0.0/16** avec une passerelle **172.18.0.1**, ainsi qu’un **sous-réseau IPv6** associé.
+Les deux conteneurs du cluster (kind-control-plane et kind-worker) sont connecté respectivement avec les adresses ip ``172.18.0.3`` et ``172.18.0.2``.
+Le paramètre **com.docker.network.bridge.enable_ip_masquerade=true** permet la traduction d’adresses (NAT) vers l’extérieur.
+
+### Multus CNI
+
+Ce plugin permet à Kubernetes de gérer plusieurs interfaces réseau par pod, contrairement à la configuration standard où chaque pod ne possède qu’une seule interface gérée par le CNI principal.
 
 <p align="center">
-  <img src="/img/etat-cluster1.png" width="780">
+  <img src="/img/multus_cni_pod.png" width="680">
   <br>
-  <em>Figure 28 : Etat du cluster</em>
+  <em>Figure 31 : Multus CNI</em>
 </p>
 
-La commande ``kubectl cluster-info`` confirme que le plan de contrôle Kubernetes est accessible via l’adresse **https://127.0.0.1:33527**, ce qui correspond au point d’accès local de l’API server exposer par kind. Elle indique également que le service **CoreDNS** est actif (pour la résolution interne des noms de services au sein du cluster).
+<p align="center">
+  <img src="/img/install-multus.png" width="880">
+  <br>
+  <em>Figure 32 : installation Multus CNI</em>
+</p>
 
 ---
 ---
@@ -454,6 +497,6 @@ La commande ``kubectl cluster-info`` confirme que le plan de contrôle Kubernete
 * **Figure 2 --> Figure 15** : Captures d'écran
 * **Figure 16** : https://www.docker.com/resources/what-container/
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
-* **Figure 18 --> Figure 24** : Captures d'écran
-* **Figure 25** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
-* **Figure 26 --> Figure 28** : Captures d'écran
+* **Figure 18 --> Figure 23** : Captures d'écran
+* **Figure 24** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
+* **Figure 25 --> Figure 32** : Captures d'écran
