@@ -572,7 +572,7 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
   <em>Figure 41 :  etats des pods</em>
 </p>
 
-* * **Init:0/1** (la plupart) : Les pods attendent que leurs init containers se terminent
+* * **Init:0/1** (pour la plupart) : Les pods attendent que leurs init containers se terminent (en rélalité il attendent que mongodb demmare correctemt)
 * * **ContainerCreating (UPF)** : Le pod UPF est en cours de création
 * * **mongodb-0** : Statut tronqué, il faut voir son état complet
 <br>
@@ -588,31 +588,57 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
 * * Le PVC de MongoDB attend un volume persistant (PV : est comme un disque dur statique dans Kubernetes) compatible, mais aucun PV n’existe dans le cluster.
 
 * **Solution** :
-  * **1.version debian pour mongodb** :
+  * **1.version debian pour mongodb** : ``tag: latest`` cette version gére un probléme c'est que la commande ``mongo`` qui n'existe plus dans les versions récentes de MongoDB
+    * ``nano free5gc/charts/mongodb/values.yaml``
+  
 <p align="center">
-  <img src="/img/" width="580">
+  <img src="/img/mongodb_config.png" width="280">
   <br>
-  <em>Figure 43  :  version debian pour mongodb</em>
+  <em>Figure 43  :  solution probléme -mongo: command not found- </em>
 </p>
 
-``nano free5gc/charts/mongodb/values.yaml``
 
-  * **2.PV** :
 
-* **configuration N6**
-``nano free5gc/values.yaml``
+  * **2.PersistantVolume** :
+<p align="center">
+  <img src="/img/folder.png" width="480">
+  <br>
+  <em>Figure 44  :   </em>
+</p>
+
+<p align="center">
+  <img src="/img/volume.png" width="580">
+  <br>
+  <em>Figure 45  :   </em>
+</p>
+
+<p align="center">
+  <img src="/img/pvc.png" width="580">
+  <br>
+  <em>Figure 46  :   </em>
+</p>
+
+pour garantir la persistance des données **MongoDB** dans Kubernetes, un PersistentVolume (PV) de 8Gi a été créé, qui est lier a un répertoire local **/home/kubedata** sur le nœud worker Kind. MongoDB génère automatiquement un PersistentVolumeClaim (PVC) de 6Gi qui se lie au PV via la StorageClass **standard**.
+
+## configuration N6
+L'interface **N6** est l'interface de l'**UPF** (User Plane Function) qui connecte le réseau 5G au **Data Network** (DN) externe.
+**N6**= passerelle vers Internet
+* ``nano free5gc/values.yaml``
 <p align="center">
   <img src="/img/N6.png" width="280">
   <br>
-  <em>Figure  :  N6 network config</em>
+  <em>Figure 47 :  N6 network config</em>
 </p>
 
-``nano free5gc/charts/free5gc-upf/values.yaml``
+* ``nano free5gc/charts/free5gc-upf/values.yaml`` : assignation d'une addresse ip pour N6.
 <p align="center">
   <img src="/img/n6if.png" width="280">
   <br>
-  <em>Figure  :  N6 interface config</em>
+  <em>Figure 48 :  N6 interface config</em>
 </p>
+
+## Deploiment de Free5GC
+
 
 ---
 ---
@@ -636,4 +662,3 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
 * **Figure 18 --> Figure 23** : Captures d'écran
 * **Figure 24** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
 * **Figure 25 --> Figure 35** : Captures d'écran
-* *Figure 43** : https://artifacthub.io/packages/helm/bitnami/mongodb/12.1.29
