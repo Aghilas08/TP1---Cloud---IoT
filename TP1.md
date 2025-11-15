@@ -588,7 +588,7 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
 * * Le PVC de MongoDB attend un volume persistant (PV : est comme un disque dur statique dans Kubernetes) compatible, mais aucun PV n’existe dans le cluster.
 
 * **Solution** :
-  * **1.version debian pour mongodb** : ``tag: latest`` cette version gére un probléme c'est que la commande ``mongo`` qui n'existe plus dans les versions récentes de MongoDB
+* **1.version debian pour mongodb** : ``tag: latest`` cette version gére un probléme c'est que la commande ``mongo`` qui n'existe plus dans les versions récentes de MongoDB
     * ``nano free5gc/charts/mongodb/values.yaml``
   
 <p align="center">
@@ -679,7 +679,7 @@ sudo kubectl delete namespace free5gc
   <img src="/img/sba.png" width="880">
 </p>
 
-* **Le cœur de réseau 5G basé sur l'architecture SBA** :
+* **Le cœur du réseau 5G basé sur l'architecture SBA** :
   * **AUSF** (Authentication Server Function) : gère l'authentification et l'autorisation des abonnés. Vérifie l'identité des utilisateurs lors de leur connexion au réseau 5G.
   * **AMF** (Access and Mobility Management Function) : contrôle l'accès au réseau et la mobilité des terminaux. Gère l'enregistrement, la connexion et les handovers entre cellules.
   * **DN** (Data Network) : réseau de données externe (Internet) auquel l'utilisateur accède via le réseau 5G.
@@ -689,6 +689,43 @@ sudo kubectl delete namespace free5gc
   * **UDM** (Unified Data Management) : stocke et gère les données d'abonnement, les profils utilisateurs et les informations d'authentification.
   * **UPF** (User Plane Function) : achemine le trafic de donné utilisateur entre le terminal et le réseau externe (DN).
 
+# Partie 4
+## Configuration de l'accès à l'interface Web Free5GC via SOCKS Proxy
+
+* **L'IP externe du cluster (worker node) :** ``172.18.0.3 ``
+<p align="center">
+  <img src="/img/ip_externe.png" width="880">
+  <br>
+  <em>Figure 52 :  ip externe</em>
+</p>
+
+### Configuration du proxy SOCKS avec FoxyProxy
+* **1.Installation l'extension FoxyProxy (Firefox)**
+<p align="center">
+  <img src="/img/fproxy.png" width="880">
+  <br>
+  <em>Figure 53 : FoxyProxy </em>
+</p>
+
+* **2.Créeation d'un tunnel SSH avec Dynamic Forward depuis la machine hote**
+  * *sur la machine hote :*  ``ssh -D 8080 -N aghi@127.0.0.1 -p 2222`` (ne pas fermer l'invite de commande )
+* **3.activation de ce proxy pour accéder aux ressources du cluster :**
+<p align="center">
+  <img src="/img/ajout_proxy.png" width="880">
+  <em>Figure 54 :  nouveau proxy activer </em>
+</p>
+
+* **4.Accé à : http://172.18.0.2:30500 via le navigateur :**
+<p align="center">
+  <img src="/img/web_free5g.png" width="880">
+  <em>Figure 55 : interface web free5gc </em>
+</p>
+
+* **5. les logs dans foxyproxy:**
+<p align="center">
+  <img src="/img/log_proxy.png" width="880">
+  <em>Figure 56 : journal du proxy</em>
+</p>
 
 ---
 ---
