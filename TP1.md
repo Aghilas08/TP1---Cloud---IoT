@@ -482,7 +482,7 @@ Ce plugin permet à Kubernetes de gérer plusieurs interfaces réseau par pod, c
 * **Pourquoi installe-t-on multus dans ce TP ?**
 On sait que Kubernetes n'a qu'une seule interface réseau par pod par défaut, mais **Free5GC** n’est pas une simple application c'est un système 5G complet qui comporte plusieurs interfaces réseau pour les fonction **AMF, SMF, UPF, AUSF, NRF...** (exemple d'interface : **N1, N2 , N3...**)
 
-
+# Partie 3
 ## Helm
 **Helm** est un outil de gestion de packages pour Kubernetes.
 * **il se compose principalement de trois éléments :**
