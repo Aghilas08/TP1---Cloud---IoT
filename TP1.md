@@ -479,10 +479,140 @@ Ce plugin permet à Kubernetes de gérer plusieurs interfaces réseau par pod, c
   <em>Figure 32 : installation Multus CNI</em>
 </p>
 
-## helm
+* **Pourquoi installe-t-on multus dans ce TP ?**
+On sait que Kubernetes n'a qu'une seule interface réseau par pod par défaut, mais **Free5GC** n’est pas une simple application c'est un système 5G complet qui comporte plusieurs interfaces réseau pour les fonction **AMF, SMF, UPF, AUSF, NRF...** (exemple d'interface : **N1, N2 , N3...**)
 
 
+## Helm
+**Helm** est un outil de gestion de packages pour Kubernetes.
+* **il se compose principalement de trois éléments :**
+  * **chart** : définit les métadonnées de l'application (nom, version, dépendances...). 
+  * **valeurs** : définissent les remplacements de variables de manière à réutiliser le chart,autrement dit c'est un fichier ou on mets nos configuration personnalisée.
+  * **répertoire de modèles (templates/)** : contient les modèles et les associe aux valeurs indiquées dans le fichier *values.yaml* pour créer des manifestes.
+  
+L'installation d'un chart Helm entraine la création d'une instance appelée *version*. Les charts Helm sont conservés d'une version à l'autre, ce qui signifie qu'on peut utiliser une ancienne version pour revenir à la configuration souhaitée.
 
+### Installation (avec un script bash)
+  * **1.creation du script :** copier depuis https://helm.sh/fr/docs/intro/install
+  * **2.droit d'execution**
+  * **3.execution du script**
+  * **4. vérification** : affichage de la version installer.
+  
+<p align="center">
+  <img src="/img/install_helm.png" width="980">
+  <br>
+  <em>Figure 33 : installation de helm</em>
+</p>
+
+Pour configurer **Free5GC**, on dois récupérer l’**IP** et la **Gateway** du worker sur son interface *eth0* (chaque nœud (control-plane / worker) n'a qu'une seule interface ''eth0'' et son IP vient du réseau Docker : 172.18.0.x)
+
+<p align="center">
+  <img src="/img/eth0.png" width="880">
+  <br>
+  <em>Figure 34 : node worker interface eth0</em>
+</p>
+
+### Téléchargement de la chart free5g
+<p align="center">
+  <img src="/img/chart_free_5g(1).png" width="880">
+  <br>
+  <em>Figure 35 : Téléchargement de la chart free5g -erreure-</em>
+</p>
+
+* **Erreure :** git ne permet pas de cloner un dossier spécifique d’un repo, seulement le repo entier.
+
+<p align="center">
+  <img src="/img/chart_free_5g(2).png" width="880">
+  <br>
+  <em>Figure 36 : Téléchargement de la chart free5g -solution-</em>
+</p>
+
+* Pour éviter cette erreure plus facilement il vaut mieux utiliser **helm pull** (c'est ce qui est demander dans le tp)
+source : https://github.com/free5gc/free5gc-helm/tree/main/docs
+
+````shell
+## commande ajoute un repository Helm à la configuration locale
+helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/towards5gs-helm/main/repo/'
+````
+
+<p align="center">
+  <img src="/img/repo-helm.png" width="880">
+  <br>
+  <em>Figure 37 :  ajoute du repository Helm</em>
+</p>
+
+<p align="center">
+  <img src="/img/chart_free_5g(3).png" width="880">
+  <br>
+  <em>Figure 38 :  Téléchargement de la chart free5g -helm pull-</em>
+</p>
+
+  * * **--version :** c'est la version qu'on a récuperer dans le resultat de la commande ``helm search repo free5g``
+  * *  **--untar :** extraire directement dans le dossier **free5g***
+
+### Installer la chart
+* Déployer et grouper (isoler) les pods de free5g dans un nouveau **namespace** : ``sudo helm install free5gc-release . -n free5gc``
+
+<p align="center">
+  <img src="/img/namespace_free5gc.png" width="580">
+  <br>
+  <em>Figure 39 :  namespace free5gc</em>
+</p>
+
+<p align="center">
+  <img src="/img/deploiment-free5g.png">
+  <br>
+  <em>Figure 40 :  deploiment des pods free5g</em>
+</p>
+
+* **verifier les pods** :
+<p align="center">
+  <img src="/img/pods_status.png" width="880">
+  <br>
+  <em>Figure 41 :  etats des pods</em>
+</p>
+
+* * **Init:0/1** (la plupart) : Les pods attendent que leurs init containers se terminent
+* * **ContainerCreating (UPF)** : Le pod UPF est en cours de création
+* * **mongodb-0** : Statut tronqué, il faut voir son état complet
+<br>
+
+* **voir les evenements** :
+<p align="center">
+  <img src="/img/mongodb_erreure.png" width="880">
+  <br>
+  <em>Figure 42 :  mongodb_erreure</em>
+</p>
+
+* * Kubernetes n’arrive pas à télécharger l’image Docker de MongoDB depuis Docker Hub.
+* * Le PVC de MongoDB attend un volume persistant (PV : est comme un disque dur statique dans Kubernetes) compatible, mais aucun PV n’existe dans le cluster.
+
+* **Solution** :
+  * **1.version debian pour mongodb** :
+<p align="center">
+  <img src="/img/" width="580">
+  <br>
+  <em>Figure 43  :  version debian pour mongodb</em>
+</p>
+
+``nano free5gc/charts/mongodb/values.yaml``
+
+  * **2.PV** :
+
+* **configuration N6**
+``nano free5gc/values.yaml``
+<p align="center">
+  <img src="/img/N6.png" width="280">
+  <br>
+  <em>Figure  :  N6 network config</em>
+</p>
+
+``nano free5gc/charts/free5gc-upf/values.yaml``
+<p align="center">
+  <img src="/img/n6if.png" width="280">
+  <br>
+  <em>Figure  :  N6 interface config</em>
+</p>
 
 ---
 ---
@@ -499,9 +629,11 @@ Ce plugin permet à Kubernetes de gérer plusieurs interfaces réseau par pod, c
 # Ressources 
 * **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
 * **Ducumentation free5gc** : https://free5gc.org/
+* **helm** : https://www.redhat.com/fr/topics/devops/what-is-helm
 * **Figure 2 --> Figure 15** : Captures d'écran
 * **Figure 16** : https://www.docker.com/resources/what-container/
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
 * **Figure 18 --> Figure 23** : Captures d'écran
 * **Figure 24** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
-* **Figure 25 --> Figure 32** : Captures d'écran
+* **Figure 25 --> Figure 35** : Captures d'écran
+* *Figure 43** : https://artifacthub.io/packages/helm/bitnami/mongodb/12.1.29
