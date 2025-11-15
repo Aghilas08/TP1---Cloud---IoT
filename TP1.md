@@ -193,7 +193,7 @@ Pour établir la connexion SSH, une redirection de port (port forwarding) a ét�
 </p>
 
 ### Mise a jour du systéme
-* Premieres commande a éxecuter :
+* **Premieres commande a éxecuter :**
 ````shell
 sudo apt update && sudo apt upgrade -y
 ````
@@ -211,6 +211,7 @@ sudo apt update && sudo apt upgrade -y
  * Préparer l'environnement pour Free5GC :
    * installer le noyau GTP5G.
  * Création du cluster Kubernetes.
+ * Plugins CNI et Multus CNI
 
 ### Prérequis
  * **VM ubuntu server** (VM installer dans la partie 1)
@@ -246,11 +247,11 @@ sudo apt update && sudo apt upgrade -y
   <em>Figure 17 : Docker repository</em>
 </p>
 
-* Instalation du package Docker :
+* **Instalation du package Docker :**
 ````bash
 sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ````
-* Verification et teste :
+* **Verification et teste :**
   
 <p align="center">
   <img src="/img/teste-docker.png" width="720">
@@ -480,9 +481,21 @@ Ce plugin permet à Kubernetes de gérer plusieurs interfaces réseau par pod, c
 </p>
 
 * **Pourquoi installe-t-on multus dans ce TP ?**
-On sait que Kubernetes n'a qu'une seule interface réseau par pod par défaut, mais **Free5GC** n’est pas une simple application c'est un système 5G complet qui comporte plusieurs interfaces réseau pour les fonction **AMF, SMF, UPF, AUSF, NRF...** (exemple d'interface : **N1, N2 , N3...**)
+On sait que Kubernetes n'a qu'une seule interface réseau par pod par défaut, mais **Free5GC** n’est pas une simple application c'est un système 5G complet qui comporte plusieurs interfaces réseau pour les fonction **AMF, SMF, UPF, AUSF,...** (exemple d'interface : **N1, N2 , N3...**)
+---
 
 # Partie 3
+### Objectif :
+* Helm (installation et utilisation)
+* Free5GC
+  * Configurer les adresses des intarfeces (N6)
+  * Déployer Free5GC avec Helm
+* Diagnostiquer et corriger les erreurs :
+  * problème d’image MongoDB
+  * erreur ''mongo: command not found''
+  * absence de PersistentVolume
+* Architecture SBA
+
 ## Helm
 **Helm** est un outil de gestion de packages pour Kubernetes.
 * **il se compose principalement de trois éléments :**
@@ -494,8 +507,8 @@ L'installation d'un chart Helm entraine la création d'une instance appelée *ve
 
 ### Installation (avec un script bash)
   * **1.creation du script :** copier depuis https://helm.sh/fr/docs/intro/install
-  * **2.droit d'execution**
-  * **3.execution du script**
+  * **2.droit d'éxecution**
+  * **3.éxecution du script**
   * **4. vérification** : affichage de la version installer.
   
 <p align="center">
@@ -504,7 +517,7 @@ L'installation d'un chart Helm entraine la création d'une instance appelée *ve
   <em>Figure 33 : installation de helm</em>
 </p>
 
-Pour configurer **Free5GC**, on dois récupérer l’**IP** et la **Gateway** du worker sur son interface *eth0* (chaque nœud (control-plane / worker) n'a qu'une seule interface ''eth0'' et son IP vient du réseau Docker : 172.18.0.x)
+Pour configurer **Free5GC**, on dois récupérer l’**IP** et la **Gateway** du worker sur son interface *eth0* (chaque nœud (control-plane / worker) n'a qu'une seule interface ''eth0'' et son IP attribuer depuis le réseau Docker : 172.18.0.x)
 
 <p align="center">
   <img src="/img/eth0.png" width="880">
@@ -588,13 +601,13 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
 * * Le PVC de MongoDB attend un volume persistant (PV : est comme un disque dur statique dans Kubernetes) compatible, mais aucun PV n’existe dans le cluster.
 
 * **Solution** :
-* **1.version debian pour mongodb** : ``tag: latest`` cette version gére un probléme c'est que la commande ``mongo`` qui n'existe plus dans les versions récentes de MongoDB
-    * ``nano free5gc/charts/mongodb/values.yaml``
+* **1.version debian pour mongodb** : ``tag: latest`` cette version génére un probléme c'est que la commande ``mongo`` elle n'existe plus dans les versions récentes de MongoDB
+    * solution : ``nano free5gc/charts/mongodb/values.yaml``
   
 <p align="center">
   <img src="/img/mongodb_config.png" width="280">
   <br>
-  <em>Figure 43  :  solution probléme -mongo: command not found- </em>
+  <em>Figure 43  :  solution probléme "mongo: command not found" </em>
 </p>
 
 
@@ -602,20 +615,18 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
   * **2.PersistantVolume** :
 <p align="center">
   <img src="/img/folder.png" width="480">
-  <br>
-  <em>Figure 44  :   </em>
 </p>
 
 <p align="center">
   <img src="/img/volume.png" width="580">
   <br>
-  <em>Figure 45  :   </em>
+  <em>Figure 44 : Creation du PersistentVolume </em>
 </p>
 
 <p align="center">
   <img src="/img/pvc.png" width="580">
   <br>
-  <em>Figure 46  :   </em>
+  <em>Figure 45 : Les volumes disponibles </em>
 </p>
 
 pour garantir la persistance des données **MongoDB** dans Kubernetes, un PersistentVolume (PV) de 8Gi a été créé, qui est lier a un répertoire local **/home/kubedata** sur le nœud worker Kind. MongoDB génère automatiquement un PersistentVolumeClaim (PVC) de 6Gi qui se lie au PV via la StorageClass **standard**.
@@ -627,14 +638,14 @@ L'interface **N6** est l'interface de l'**UPF** (User Plane Function) qui connec
 <p align="center">
   <img src="/img/N6.png" width="280">
   <br>
-  <em>Figure 47 :  N6 network config</em>
+  <em>Figure 46 :  N6 network config</em>
 </p>
 
 * ``nano free5gc/charts/free5gc-upf/values.yaml`` : assignation d'une addresse ip pour N6.
 <p align="center">
   <img src="/img/n6if.png" width="280">
   <br>
-  <em>Figure 48 :  N6 interface config</em>
+  <em>Figure 47 :  N6 interface config</em>
 </p>
 
 ## Deploiment de Free5GC
@@ -655,24 +666,27 @@ sudo kubectl delete namespace free5gc
 <p align="center">
   <img src="/img/deploying free5g.png" width="880">
   <br>
-  <em>Figure 49 :  deploiment free5g</em>
+  <em>Figure 48 :  deploiment free5g</em>
 </p>
 
 <p align="center">
   <img src="/img/pods_status(2).png" width="880">
   <img src="/img/svc.png" width="880">
   <br>
-  <em>Figure 50 : </em>
+  <em>Figure 49 : etat des pods de free5gc</em>
 </p>
 
-* **Description du pod UPF** :
+* **Description du pod UPF** : (voir les derniers événements)
   * ``sudo kubectl describe pod free5gc-premier-free5gc-upf-upf-56b77f55d8-t64jm -n free5gc``
 
 <p align="center">
   <img src="/img/upf.png" width="880">
   <br>
-  <em>Figure 51 :  information sur le pod UPF</em>
+  <em>Figure 50 :  information sur le pod UPF</em>
 </p>
+Le journal affiche que le conteneur upf a été créé puis démarré sans erreur, indiquant un lancement réussi du service UPF.
+le pod free5gc-upf a été correctement assigné sur le nœud kind-worker et que plusieurs interfaces réseau (eth0, n3, n6, n4) lui ont été attribuées via multus.
+
 
 ### Rappel sur Service-Based Architecture
 <p align="center">
@@ -689,14 +703,24 @@ sudo kubectl delete namespace free5gc
   * **UDM** (Unified Data Management) : stocke et gère les données d'abonnement, les profils utilisateurs et les informations d'authentification.
   * **UPF** (User Plane Function) : achemine le trafic de donné utilisateur entre le terminal et le réseau externe (DN).
 
+---
+
 # Partie 4
+
+### objectifs
+* Mettre en place un tunnel SSH dynamique
+* Configurer l’extension FoxyProxy
+* Acceder a l'interface web de free5gc
+
+L’interface Web de Free5GC tourne à l’intérieur d’une machine virtuelle / d’un cluster isolé, et n’est pas directement accessible depuis mon navigateur (sur la machine hote).
+
 ## Configuration de l'accès à l'interface Web Free5GC via SOCKS Proxy
 
 * **L'IP externe du cluster (worker node) :** ``172.18.0.3 ``
 <p align="center">
   <img src="/img/ip_externe.png" width="880">
   <br>
-  <em>Figure 52 :  ip externe</em>
+  <em>Figure 51 :  ip externe</em>
 </p>
 
 ### Configuration du proxy SOCKS avec FoxyProxy
@@ -704,7 +728,7 @@ sudo kubectl delete namespace free5gc
 <p align="center">
   <img src="/img/fproxy.png" width="880">
   <br>
-  <em>Figure 53 : FoxyProxy </em>
+  <em>Figure 52 : FoxyProxy </em>
 </p>
 
 * **2.Créeation d'un tunnel SSH avec Dynamic Forward depuis la machine hote**
@@ -712,22 +736,25 @@ sudo kubectl delete namespace free5gc
 * **3.activation de ce proxy pour accéder aux ressources du cluster :**
 <p align="center">
   <img src="/img/ajout_proxy.png" width="880">
-  <em>Figure 54 :  nouveau proxy activer </em>
+  <em>Figure 53 :  nouveau proxy activer </em>
 </p>
 
 * **4.Accé à : http://172.18.0.2:30500 via le navigateur :**
 <p align="center">
   <img src="/img/web_free5g.png" width="880">
-  <em>Figure 55 : interface web free5gc </em>
+  <em>Figure 54 : interface web free5gc </em>
 </p>
 
 * **5. les logs dans foxyproxy:**
 <p align="center">
   <img src="/img/log_proxy.png" width="880">
-  <em>Figure 56 : journal du proxy</em>
+  <em>Figure 55 : journal (log) du proxy</em>
 </p>
 
 ---
+
+# Partie 5
+
 ---
 # Glossaire
 * **CNI plugins** : Container Network Interface plugins
@@ -748,4 +775,4 @@ sudo kubectl delete namespace free5gc
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
 * **Figure 18 --> Figure 23** : Captures d'écran
 * **Figure 24** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
-* **Figure 25 --> Figure 35** : Captures d'écran
+* **Figure 25 --> Figure 55** : Captures d'écran
