@@ -638,6 +638,56 @@ L'interface **N6** est l'interface de l'**UPF** (User Plane Function) qui connec
 </p>
 
 ## Deploiment de Free5GC
+* **Suppression de l'ancien deploiment :**
+````shell
+sudo helm uninstall free5gc-release . -n free5gc
+
+# Forcer la suppression de tous les pods
+sudo kubectl delete pods --all -n free5gc --grace-period=0 --force
+
+# Ou supprimer le namespace entier (plus radical)
+sudo kubectl delete namespace free5gc
+````
+
+* **Déploiment et verification des pods :**
+  * `` sudo helm install free5gc-premier . -n free5gc``
+
+<p align="center">
+  <img src="/img/deploying free5g.png" width="880">
+  <br>
+  <em>Figure 49 :  deploiment free5g</em>
+</p>
+
+<p align="center">
+  <img src="/img/pods_status(2).png" width="880">
+  <img src="/img/svc.png" width="880">
+  <br>
+  <em>Figure 50 : </em>
+</p>
+
+* **Description du pod UPF** :
+  * ``sudo kubectl describe pod free5gc-premier-free5gc-upf-upf-56b77f55d8-t64jm -n free5gc``
+
+<p align="center">
+  <img src="/img/upf.png" width="880">
+  <br>
+  <em>Figure 51 :  information sur le pod UPF</em>
+</p>
+
+### Rappel sur Service-Based Architecture
+<p align="center">
+  <img src="/img/sba.png" width="880">
+</p>
+
+* **Le cœur de réseau 5G basé sur l'architecture SBA** :
+  * **AUSF** (Authentication Server Function) : gère l'authentification et l'autorisation des abonnés. Vérifie l'identité des utilisateurs lors de leur connexion au réseau 5G.
+  * **AMF** (Access and Mobility Management Function) : contrôle l'accès au réseau et la mobilité des terminaux. Gère l'enregistrement, la connexion et les handovers entre cellules.
+  * **DN** (Data Network) : réseau de données externe (Internet) auquel l'utilisateur accède via le réseau 5G.
+  * **NSSF** (Network Slice Selection Function): sélectionne le slice appropriée selon le type de service demandé par l'utilisateur.
+  * **PCF** (Policy Control Function) : définit et applique les politiques de contrôle : qualité de service (QoS), tarification, gestion des flux de données.
+  * **SMF** (Session Management Function) : gère les sessions de données : établissement, modification et terminaison des connexions PDU. Alloue les adresses IP.
+  * **UDM** (Unified Data Management) : stocke et gère les données d'abonnement, les profils utilisateurs et les informations d'authentification.
+  * **UPF** (User Plane Function) : achemine le trafic de donné utilisateur entre le terminal et le réseau externe (DN).
 
 
 ---
