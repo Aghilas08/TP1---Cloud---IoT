@@ -923,3 +923,5 @@ ueransim-premier-ue-c7fd9b989-bs7fb
 * **Figure 18 --> Figure 23** : Captures d'écran
 * **Figure 24** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
 * **Figure 25 --> Figure 65** : Captures d'écran
+
+* **Ce rapport est sur github** :
