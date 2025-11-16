@@ -205,7 +205,7 @@ sudo apt update && sudo apt upgrade -y
   * **La Linux Foundation** est une organisation à but non lucratif qui soutient le développement de projets open source, dont Linux et de nombreuses technologies comme Kubernetes.
   * **Le 3GPP** est un partenariat international d’organismes de normalisation,leurs roles est de standardiser les protocoles et les architectures réseaux télécomes (3G, 4G, 5G,...)
 
-### Objectif : 
+### Objectif 
  * Installation des outils essentiels :
    * docker, kind, kubectl
  * Préparer l'environnement pour Free5GC :
@@ -485,7 +485,7 @@ On sait que Kubernetes n'a qu'une seule interface réseau par pod par défaut, m
 ---
 
 # Partie 3
-### Objectif :
+### Objectif
 * Helm (installation et utilisation)
 * Free5GC
   * Configurer les adresses des intarfeces (N6)
@@ -629,7 +629,7 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
   <em>Figure 45 : Les volumes disponibles </em>
 </p>
 
-pour garantir la persistance des données **MongoDB** dans Kubernetes, un PersistentVolume (PV) de 8Gi a été créé, qui est lier a un répertoire local **/home/kubedata** sur le nœud worker Kind. MongoDB génère automatiquement un PersistentVolumeClaim (PVC) de 6Gi qui se lie au PV via la StorageClass **standard**.
+pour garantir la persistance des données **MongoDB** dans Kubernetes, un PersistentVolume (PV) de 8GB a été créé, qui est lier a un répertoire local **/home/kubedata** sur le nœud worker Kind. MongoDB génère automatiquement un PersistentVolumeClaim (PVC) de 6Gi qui se lie au PV via la StorageClass **standard**.
 
 ## configuration N6
 L'interface **N6** est l'interface de l'**UPF** (User Plane Function) qui connecte le réseau 5G au **Data Network** (DN) externe.
@@ -712,7 +712,7 @@ le pod free5gc-upf a été correctement assigné sur le nœud kind-worker et que
 * Configurer l’extension FoxyProxy
 * Acceder a l'interface web de free5gc
 
-L’interface Web de Free5GC tourne à l’intérieur d’une machine virtuelle / d’un cluster isolé, et n’est pas directement accessible depuis mon navigateur (sur la machine hote).
+L’interface Web de Free5GC tourne à l’intérieur d’une machine virtuelle et d’un cluster isolé, et n’est pas directement accessible depuis mon navigateur (sur la machine hote).
 
 ## Configuration de l'accès à l'interface Web Free5GC via SOCKS Proxy
 
@@ -745,6 +745,8 @@ L’interface Web de Free5GC tourne à l’intérieur d’une machine virtuelle 
   <em>Figure 54 : interface web free5gc </em>
 </p>
 
+--> Login : admin || password : free5gc
+
 * **5. les logs dans foxyproxy:**
 <p align="center">
   <img src="/img/log_proxy.png" width="880">
@@ -754,16 +756,81 @@ L’interface Web de Free5GC tourne à l’intérieur d’une machine virtuelle 
 ---
 
 # Partie 5
+### installation UERANSIM
+
+<p align="center">
+  <img src="/img/abonnee(1).png" width="880">
+  <em>Figure 56 : </em>
+</p>
+
+* cette erreur est causé par l'absence du répértpoir **useransim** dans charts free5gc (puisque j'ai pas clonner https://github.com/free5gc/free5gc-helm.git au lieu de sa j'ai utiliser **helm pull**)
+
+<p align="center">
+  <img src="/img/useransim_helm.png" width="880">
+  <em>Figure 57 : </em>
+</p>
+
+* **installation avec helm :**
+  
+````shell
+$ pwd
+/home/aghi/5G/ueransim
+$ ls -l
+total 32
+-rw-r--r-- 1 aghi aghi  271 nov.  16 11:50 Chart.yaml
+-rw-r--r-- 1 aghi aghi 1950 nov.  16 11:50 open5gs-values.yaml
+-rw-r--r-- 1 aghi aghi 8617 nov.  16 11:50 README.md
+drwxr-xr-x 5 aghi aghi 4096 nov.  16 11:50 templates
+-rw-r--r-- 1 aghi aghi 4803 nov.  16 11:50 values.yaml
+
+$ sudo helm -n free5gc install ueransim-premier .
+````
+<p align="center">
+  <img src="/img/useransim_install.png" width="980">
+  <em>Figure 58 : </em>
+</p>
+
+* **résultat :**
+<p align="center">
+  <img src="/img/ue_gnb.png" width="980">
+  <em>Figure 59 : </em>
+</p>
+
+**UERANSIM simule** : Cela permet de tester le cœur de réseau 5G (Free5gc)
+  * *UE* (User Equipment) : terminal 5G (exemple : Un smartphone)
+  * *gNB* (Base Station) : Une antenne 5G
+
+### Ajout d'un abonné
+<p align="center">
+  <img src="/img/ajout_abonnee.png" width="980">
+  <em>Figure 60 : </em>
+</p>
+
+<p align="center">
+  <img src="/img/restart_pod_ue.png" width="980">
+  <em>Figure 61 : </em>
+</p>
+
+<p align="center">
+  <img src="/img/ue_enregistrer.png" width="980">
+  <em>Figure 62 : </em>
+</p>
+
+* **teste :**
+
+
 
 ---
 # Glossaire
 * **CNI plugins** : Container Network Interface plugins
+* **IP** : Internet Protocole
 * **VM** : Virtual Machine
 * **5G** : 5 Generation
 * **5GC** : 5G Core Network
 * **3GPP** : 3rd Generation Partnership Project
 * **gNB** : Next Generation Node B
 * **gtp5g** : GPRS Tunneling Protocol for 5G
+* **UE** : User Equipement
 
 ---
 # Ressources 
