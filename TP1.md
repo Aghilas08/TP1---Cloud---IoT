@@ -232,11 +232,11 @@ sudo apt update && sudo apt upgrade -y
 
 ### Objectif 
  * Installation des outils essentiels :
-   * docker, kind, kubectl
+   * docker, kind, kubectl.
  * Préparer l'environnement pour Free5GC :
    * installer le noyau GTP5G.
  * Création du cluster Kubernetes.
- * Plugins CNI et Multus CNI
+ * Plugins CNI et Multus CNI.
 
 ### Prérequis
  * **VM ubuntu server** (VM installer dans la partie 1)
@@ -517,15 +517,15 @@ On sait que Kubernetes n'a qu'une seule interface réseau par pod par défaut, m
 
 # Partie 3
 ### Objectif
-* Helm (installation et utilisation)
+* Helm (installation et utilisation).
 * Free5GC
   * Configurer les adresses des intarfeces (N6)
-  * Déployer Free5GC avec Helm
+  * Déployer Free5GC avec Helm.
 * Diagnostiquer et corriger les erreurs :
-  * problème d’image MongoDB
-  * erreur ''mongo: command not found''
-  * absence de PersistentVolume
-* Architecture SBA
+  * problème d’image MongoDB.
+  * erreur ''mongo: command not found''.
+  * absence de PersistentVolume.
+* Architecture SBA.
 
 ## Helm
 **Helm** est un outil de gestion de packages pour Kubernetes.
