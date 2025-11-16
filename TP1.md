@@ -1,9 +1,8 @@
 ----
 Auteur : Aghilas OULD BRAHAM
-----
 Groupe : RSA 2025-2026
 ----
-<h3 align="center">Rapport : 5G Telco Cloud</h3>
+<h3 align="center">Rapport : UPC Réseau 5G</h3>
 
 <p align="center"><i>Simulation 5G Core Network </i></p>
 <p align="center">
@@ -19,7 +18,33 @@ Groupe : RSA 2025-2026
     <a href="https://ubuntu.com/">
        <img alt="Ubuntu version" src="https://img.shields.io/badge/Ubuntu-22.04%20LTS-E95420?logo=ubuntu&logoColor=white">
     </a>
+    <a href="https://www.docker.com/">
+      <img alt="Docker version" src="https://img.shields.io/badge/Docker-28.0-blue?logo=docker&logoColor=white">
+    </a>
+    <a href="https://kind.sigs.k8s.io/">
+      <img alt="Kind version" src="https://img.shields.io/badge/Kind-0.30.0-orange?logo=kubernetes&logoColor=white">
+    </a>
+  <a href="https://helm.sh/">
+    <img alt="Helm version" src="https://img.shields.io/badge/Helm-4.0-0F1689?logo=helm&logoColor=white">
+  </a>
+<a href="https://kubernetes.io/docs/reference/kubectl/">
+   <img alt="kubectl version" src="https://img.shields.io/badge/kubectl-1.33.5-blue?logo=kubernetes&logoColor=white">
+</a>
+
+
 </p>
+
+<p align="center"><i>TP proposer par : Mr BERROUBACHE Willem</i></p>
+<p align="center"><i>Réaliser par : OULD BRAHAM Aghilas </i></p>
+
+---
+
+# Introduction
+Ce tp a pour objectif de déployer et expérimenter un cœur de **réseau 5G** (5G Core Network) dans **un environnement entièrement virtualisé**. En utilisant Free5GC, une implémentation open-source conforme aux normes 3GPP,cela nous permet de comprendre le fonctionnement de l'architecture Service-Based Architecture qui caractérise les réseaux de cinquième génération.
+
+Le déploiement utilise des outils de **conteneurisation** et **d’orchestration** comme Docker, Kubernetes (avec Kind) et Helm. Tous les composants du cœur 5G (AMF, SMF, UPF, AUSF, UDM, PCF, NSSF) sont installés dans un cluster Kubernetes. Les interfaces réseau 5G (N1 à N6) sont configurées grâce au **plugin Multus CNI**et au **module GTP5G**, afin de permettre le bon fonctionnement du trafic utilisateur.
+
+Pour valider le fonctionnement complet du système, on a besoin de **simuler un terminal utilisateur** (UE) et **une station de base** (gNB), permettant de réaliser des testes de connectivité jusqu'au Internet.
 
 ---
 # Partie 1
@@ -318,7 +343,7 @@ Le module **gtp5g** a été chargé avec succès dans **le noyau Linux** et conf
 <p align="center">
   <img src="/img/process-gtp5g.png" width="720">
   <br>
-  <em>Figure 21 : processus GTP5G</em>
+  <em>Figure 21 : GTP5G est bien charger</em>
 </p>
 
 * **gtp5g** : Module chargé, taille 151552 octets, avec 0 utilisateurs actifs pour le moment
@@ -342,7 +367,7 @@ sudo mv ./kind /usr/local/bin/kind
 <p align="center">
   <img src="/img/kind.png" width="400">
   <br>
-  <em>Figure 22 : kind</em>
+  <em>Figure 22 : version kind</em>
 </p>
 
 
@@ -397,7 +422,7 @@ kind-worker
   * **kube-apiserver :** C’est le point d’entrée central pour toutes les commandes kubectl, les communications internes et externes (Il s'agit du front-end pour le plan de contrôle Kubernetes).
   * **etcd :** Base de données clé-valeur consistante et hautement disponible utilisée comme mémoire de sauvegarde pour toutes les données du cluste.
   * **kube-scheduler :** Il a pour rôle de surveiller les pods nouvellement créés et choisir sur quel nœud chaque un pod va s’exécuter.
-  * **controller-manager :**
+  * **controller-manager :** regroupe et exécute l’ensemble des contrôleurs Kubernetes, il est chargés de surveiller l’état du cluster.
 
 <p align="center">
   <img src="/img/etat-cluster.png" width="780">
@@ -420,6 +445,12 @@ La commande ``kubectl get nodes -o wide`` permet d’obtenir des informations d�
 </p>
 
 La commande ``kubectl cluster-info`` confirme que le plan de contrôle Kubernetes est accessible via l’adresse **https://127.0.0.1:33527**, ce qui correspond au point d’accès local de l’API server exposer par kind. Elle indique également que le service **CoreDNS** est actif (pour la résolution interne des noms de services au sein du cluster).
+
+* **Composants du nœud :**
+  * **kubelet** : Un agent qui s'exécute sur chaque nœud du cluster. Il s'assure que les conteneurs fonctionnent dans un pod.
+  * **Runtime** : exécute les conteneur.
+  * **pod** : est la plus petite unité déployable dans Kubernetes, regroupant un ou plusieurs conteneurs (**best practice :** max de conteneur dans un seul pod = **02**) partageant le même stockage, réseau et spécifications d’exécution.
+
 ### Ajout des CNI plugins
 Les **CNI plugins** sont des composants du réseau dans Kubernetes. Ils assurent la connectivité entre les pods, ainsi qu’entre les pods et le monde extérieur.le CNI définit comment un pod obtient une adresse IP, comment il se connecte au réseau, et comment la communication entre pods est gérée à l’intérieur du cluster.
 
@@ -561,7 +592,7 @@ helm repo add towards5gs 'https://raw.githubusercontent.com/Orange-OpenSource/to
 </p>
 
   * * **--version :** c'est la version qu'on a récuperer dans le resultat de la commande ``helm search repo free5g``
-  * *  **--untar :** extraire directement dans le dossier **free5g***
+  * *  **--untar :** extraire directement dans le dossier **free5gc**
 
 ### Installer la chart
 * Déployer et grouper (isoler) les pods de free5g dans un nouveau **namespace** : ``sudo helm install free5gc-release . -n free5gc``
@@ -756,18 +787,23 @@ L’interface Web de Free5GC tourne à l’intérieur d’une machine virtuelle 
 ---
 
 # Partie 5
+### Objectifs
+* Installer UERANSIM avec helm.
+* Ajout d'un abonné dans l'interface web free5gc.
+* Tester la connexion
+
 ### installation UERANSIM
 
 <p align="center">
   <img src="/img/abonnee(1).png" width="880">
-  <em>Figure 56 : </em>
+  <em>Figure 56 : /useransim est introuvable -impossible d'istaller useransim-</em>
 </p>
 
 * cette erreur est causé par l'absence du répértpoir **useransim** dans charts free5gc (puisque j'ai pas clonner https://github.com/free5gc/free5gc-helm.git au lieu de sa j'ai utiliser **helm pull**)
 
 <p align="center">
   <img src="/img/useransim_helm.png" width="880">
-  <em>Figure 57 : </em>
+  <em>Figure 57 : helm pull /useransim</em>
 </p>
 
 * **installation avec helm :**
@@ -787,14 +823,16 @@ $ sudo helm -n free5gc install ueransim-premier .
 ````
 <p align="center">
   <img src="/img/useransim_install.png" width="980">
-  <em>Figure 58 : </em>
+  <em>Figure 58 : installation UERANSIM avec helm</em>
 </p>
 
 * **résultat :**
 <p align="center">
   <img src="/img/ue_gnb.png" width="980">
-  <em>Figure 59 : </em>
+  <em>Figure 59 : worker node complet</em>
 </p>
+
+--> le **worker node** : au finale ce neud héberge tous les pods de l'infrastructure 5G.
 
 **UERANSIM simule** : Cela permet de tester le cœur de réseau 5G (Free5gc)
   * *UE* (User Equipment) : terminal 5G (exemple : Un smartphone)
@@ -816,11 +854,50 @@ $ sudo helm -n free5gc install ueransim-premier .
   <em>Figure 62 : </em>
 </p>
 
-* **teste :**
+# Teste
+* **ping UE -- UPF** :
+<p align="center">
+  <img src="/img/ue_ping_upf.png" width="980">
+  <em>Figure 63 : ping ue -- upf OK</em>
+</p>
 
+* **ping UE -- DN (google)** :
+<p align="center">
+  <img src="/img/ue_ping_dn.png" width="980">
+  <em>Figure 63 : ping ue -- dn erreure</em>
+</p>
 
+* **identification et résolution du probléme :**
 
----
+<p align="center">
+  <img src="/img/erreur_ping.png" width="980">
+  <em>Figure 64 : identifier le probleme -gateway-</em>
+</p>
+
+la communication entre ue et upf fonctionne correctement, l'UPF ne peut pas router le trafic vers Internet. La cause est une configuration incorrecte de la route par défaut dans l'upf.
+La route par défaut est configurée avec ``172.18.0.0`` comme destination, ce qui correspond à l'adresse du réseau Docker Kind, alors qu'elle devrait pointer vers ``172.18.0.1``, qui est l'adresse de la passerelle (gateway) permettant la sortie vers Internet (cette erreur je l'ai commis quand j'ai configurer **N6**).
+
+  * ``nano free5gc/values.yaml``
+<p align="center">
+  <img src="/img/soluyion_gw.png" width="200">
+</p>
+
+  * **refaire les étapes : "Deploiment de Free5GC" de la partie 3**
+  * **refaire toutes les étapes de la partie 5**
+
+````shell
+## récupere le nom du pod ue et le mettre dans une variable
+$ export POD_NAME=$(sudo kubectl get pods --namespace free5gc -l "component=ue" -o jsonpath="{.items[0].metadata.name}")
+
+$ echo $POD_NAME
+ueransim-premier-ue-c7fd9b989-bs7fb
+````
+<p align="center">
+  <img src="/img/teste_connection_ue_dn.png" width="980">
+  <em>Figure 65 : connexion internet</em>
+</p>
+
+----
 # Glossaire
 * **CNI plugins** : Container Network Interface plugins
 * **IP** : Internet Protocole
@@ -833,13 +910,16 @@ $ sudo helm -n free5gc install ueransim-premier .
 * **UE** : User Equipement
 
 ---
-# Ressources 
-* **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
+# Ressources
 * **Ducumentation free5gc** : https://free5gc.org/
+* **Ducumentation docker** : https://github.com/Aghilas08/Docker.git
+* **Ducumentation k8s** : https://kubernetes.io/docs/concepts/
+* **Ducumentation helm** : https://helm.sh/docs/
+* **Figure 1** : https://techtoday.lenovo.com/fr/fr/solutions/smb/hyperviseur
 * **helm** : https://www.redhat.com/fr/topics/devops/what-is-helm
 * **Figure 2 --> Figure 15** : Captures d'écran
 * **Figure 16** : https://www.docker.com/resources/what-container/
 * **Figure 17** : https://github.com/Aghilas08/Docker.git
 * **Figure 18 --> Figure 23** : Captures d'écran
 * **Figure 24** : https://kubernetes.io/fr/docs/concepts/architecture/#plugins-r%C3%A9seau
-* **Figure 25 --> Figure 55** : Captures d'écran
+* **Figure 25 --> Figure 65** : Captures d'écran
