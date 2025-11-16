@@ -790,7 +790,7 @@ L’interface Web de Free5GC tourne à l’intérieur d’une machine virtuelle 
 ### Objectifs
 * Installer UERANSIM avec helm.
 * Ajout d'un abonné dans l'interface web free5gc.
-* Tester la connexion
+* Tester la connexion.
 
 ### installation UERANSIM
 
