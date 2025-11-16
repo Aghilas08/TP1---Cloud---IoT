@@ -132,7 +132,7 @@ A la fin de l'installation de l'os on doit impérativement redémarrer la **vm**
   <em>Figure 10 : informations sur utilisateur</em>
 </p>
 
-###### utilisateur "aghi" avec l'id 1000 est membre du groupe sudo ce qui implique que cette utilisateur peut executer des commandes en tant que super-utilisateur.
+* utilisateur "aghi" avec l'id 1000 est membre du groupe *sudo* ce qui implique que cette utilisateur peut executer des commandes en tant que super-utilisateur.
 
 ### La configuration réseau
 <p align="center">
@@ -141,8 +141,8 @@ A la fin de l'installation de l'os on doit impérativement redémarrer la **vm**
   <em>Figure 11 : informations réseau</em>
 </p>
 
-###### ens33 : (@MAC = 00:0c:29:f6:ef:f2) lui est attribuer l'addresse ip 192.168.232.132 (auprés d'un serveur dhcp)
-###### lo : c'est l'interface loopback (locale) avec une ip 127.0.0.1
+* ens33 : (@MAC = 00:0c:29:f6:ef:f2) lui est attribuer l'addresse ip 192.168.232.132 (auprés d'un serveur dhcp)
+* lo : c'est l'interface loopback (locale) avec une ip 127.0.0.1
 ### Service SSH
 <p align="center">
   <img src="/img/ssh2.png" width="720">
@@ -150,7 +150,7 @@ A la fin de l'installation de l'os on doit impérativement redémarrer la **vm**
   <em>Figure 12 : informations service ssh</em>
 </p>
 
-###### active(running) signifie que le service ssh est bien installer et en mode listen (en ecoute) sur le port par défault 22.
+* **active** (running) signifie que le service ssh est bien installer et en mode listen (en ecoute) sur le port par défault 22.
 #### Commande utile :
 ````shell
 systemctl status ssh  # donne des infos sur le service
